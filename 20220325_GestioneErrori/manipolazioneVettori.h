@@ -8,7 +8,7 @@ void stampaVettore(int* v, int vLength, char* vName) {
 
 	for (size_t i = 0; i < vLength; i++)
 	{
-		printf("%s[%d]\t=\t%d", vName, i, v[i]);
+		printf("%s[%d]\t=\t%d\n", vName, i, v[i]);
 	}
 }
 

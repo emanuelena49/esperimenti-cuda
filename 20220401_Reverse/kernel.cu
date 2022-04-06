@@ -51,15 +51,29 @@ __global__ void dynamicReverse(int* v, int vLength) {
 
 int main() {
 
+	bool dynamic=true;
+
+	// printf("Vuoi eseguire l'algoritmo con allocazione dinamica? (con allocazione statica sei limitato ad un vettore di lungh 64) si/no [default: si]");
+	// std::string dinamicaSiNo;
+	// int res = scanf("%s", &dinamicaSiNo);
+	// if (res != EOF && dinamicaSiNo == "no") {
+	// 	dynamic = false;
+	// 	printf("procedo con allocazione statica (NOTA: la lungh. dell'input è limitata a 64)\n");
+	// }
+	// else {
+	// 	dynamic = true;
+	// 	printf("procedo con allocazione dinamica\n");
+	// }
+
+
+
 	int vLength;
 	printf("Inserisci il numero di elementi del vettore di input: ");
 	int res = scanf("%d", &vLength);
 
-	if (res == EOF) {
-		return -1;
-	}
-
-	if (res < 1) {
+	if (res == EOF && vLength < 1) {
+		printf("Errore: è stato inserito un valore non accettabile "
+			"(assicurati di aver inserito un numero intero >= 1)\n");
 		return -1;
 	}
 
@@ -76,7 +90,12 @@ int main() {
 	HANDLE_ERROR(cudaMemcpy(vDevice, vHost, vLength * sizeof(int), cudaMemcpyHostToDevice));
 
 
-	staticReverse<<<1, vLength>>>(vDevice, vLength);
+	if (dynamic) {
+		dynamicReverse << <1, vLength, vLength * sizeof(int) >> > (vDevice, vLength);
+	}
+	else {
+		staticReverse << <1, vLength >> > (vDevice, vLength);
+	}
 
 	cudaDeviceSynchronize();
 	checkKernelError("Errore nell'operzione");
